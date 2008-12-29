@@ -1,0 +1,90 @@
+\input{pywsgi.tex}   % Import common styles.
+\fancyfoot[C]{Page \thepage}
+\title{\productname\ Release \productversion\\
+User Documentation\\
+\vspace{5 mm}
+\large A high-level class-based API around WSGI/CGI/mod\_python}
+\author{Samuel Abels}
+
+\begin{document}
+\maketitle
+\tableofcontents
+
+\newpage
+\section{Introduction}
+\subsection{Why \productname?}
+
+pywsgi provides the following features:
+
+\begin{enumerate}
+\item An abstraction from low-level gateway interface handlers like WSGI,
+CGI, and mod\_python.
+\item A consistent high-level, class-based interface.
+\item Session handling.
+\item Cookie handling.
+\item GET/POST data handling.
+\item Error handling.
+\item A pywsgi.util namespace with useful tools.
+\end{enumerate}
+
+
+\subsection{Legal Information}
+
+\product and this handbook are distributed under the terms and conditions 
+of the GNU GPL (General Public License) Version 2. You should have received 
+a copy of the GPL along with \product. If you did not, you may read it here:
+
+\vspace{1em}
+\url{http://www.gnu.org/licenses/gpl-2.0.txt}
+\vspace{1em}
+
+If this license does not meet your requirements you may contact us under 
+the points of contact listed in the following section. Please let us know 
+why you need a different license - perhaps we may work out a solution 
+that works for either of us.
+
+
+\subsection{Contact Information \& Feedback}
+
+If you spot any errors, or have ideas for improving \product or this 
+documentation, your suggestions are gladly accepted.
+We offer the following contact options: \\
+
+\input{contact.tex}
+
+\newpage
+\section{Overview}
+
+The following example shows how to use \product. First, place the following 
+code in your index file:
+
+\begin{lstlisting}
+#!/usr/bin/python
+import os, os.path, sys
+os.chdir(os.path.dirname(__file__))
+sys.path.insert(0, '.')
+
+# This handler runs your actual web site.
+def handler(request):
+    import mymodule
+    mymodule.run(request)
+
+# Hook for most adapters.
+if __name__ == '__main__':
+    from pywsgi import RequestHandler
+    request_handler = RequestHandler(handler)
+
+# Special cased hook for mod_python.
+def index(req):
+    from pywsgi import ModPythonRequest
+    request = ModPythonRequest(req)
+    request.handle(handler)
+\end{lstlisting}
+
+This example should work on any server that supports any of WSGI, CGI, or
+mod\_python. Note that the real work is done in the {\it handler()} function.
+You may import and run your web server's code there.
+
+\product provides additional methods and utilities.
+For a complete list please refer to our API documentation.
+\end{document}
