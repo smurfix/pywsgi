@@ -17,15 +17,15 @@ from ConfigParser import RawConfigParser
 
 class Session(object):
     def __init__(self, request, lifetime = 60 * 60):
+        self.request     = request
         self.session_dir = request.get_session_directory()
-        self.request     = kwargs['request']
         self.sid         = None
         self.data        = {}
         self.rcparser    = RawConfigParser()
         self.lifetime    = lifetime
-        if self.session_directory is None:
+        if self.session_dir is None:
             raise Exception('Please call set_session_directory() first.')
-        if not os.path.isdir(self.session_directory):
+        if not os.path.isdir(self.session_dir):
             raise Exception('No such directory: %s' % self.session_dir)
         self.start()
 
@@ -42,7 +42,7 @@ class Session(object):
         filename = self._get_session_filename()
         dirname  = os.path.dirname(filename)
         if not os.path.exists(dirname):
-            os.path.makedirs(dirname)
+            os.makedirs(dirname)
 
         # Save the session.
         self.rcparser.add_section('session')

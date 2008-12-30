@@ -12,7 +12,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-from Url import Url
+from Url     import Url
+from Session import Session
 
 class Request(object):
     def __init__(self, **kwargs):
@@ -23,6 +24,7 @@ class Request(object):
         self.content_type = 'text/html; charset=utf-8'
         self.data         = ''
         self.session_dir  = kwargs.get('session_dir')
+        self.session      = None
         if self.session_dir is None:
             self.session_dir = '/tmp'
 
@@ -71,6 +73,16 @@ class Request(object):
 
     def get_session_directory(self):
         return self.session_dir
+
+
+    def start_session(self):
+        if not self.session:
+            self.session = Session(self)
+        return self.session
+
+
+    def get_session(self):
+        return self.session
 
 
     def get_current_url(self, **kwargs):
