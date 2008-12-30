@@ -25,8 +25,8 @@ class Url(object):
             self.set_var('rewrite', 1)
 
 
-    def set_path(self, key, value):
-        self.vars.append((key, value))
+    def set_path(self, path):
+        self.path = str(path)
 
 
     def find_var(self, key, value = None):
@@ -40,6 +40,7 @@ class Url(object):
 
 
     def set_var(self, key, value):
+        key, value = str(key), str(value)
         pos = self.find_var(key)
         if pos >= 0 and value is None:
             del self.vars[pos]

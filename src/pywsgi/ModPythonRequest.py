@@ -81,6 +81,14 @@ class ModPythonRequest(Request):
         return self.cookies.get(key, default)
 
 
+    def add_header(self, key, value):
+        return self.headers_out.add(key, value)
+
+
+    def get_headers(self):
+        return self.headers_out.items()
+
+
     def flush(self):
         self.request.content_type = self.content_type
         self.request.write(self.data)
