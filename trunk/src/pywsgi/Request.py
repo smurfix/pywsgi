@@ -14,6 +14,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 from Url     import Url
 from Session import Session
+from Table   import Table
 
 class Request(object):
     def __init__(self, **kwargs):
@@ -42,6 +43,14 @@ class Request(object):
 
     def set_content_type(self, type):
         self.content_type = type
+
+
+    def add_header(self, key, value):
+        raise Exception('add_header() not implemented...')
+
+
+    def get_headers(self):
+        raise Exception('get_headers() not implemented...')
 
 
     def write(self, data):

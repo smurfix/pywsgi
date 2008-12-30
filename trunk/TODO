@@ -1,0 +1,2 @@
+* Use the Table object for uniform access to GET, POST, and session data as well as cookies.
+* Create a Storage object that handles storing the session data.

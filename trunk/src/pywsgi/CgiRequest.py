@@ -99,11 +99,19 @@ class CgiRequest(Request):
 
 
     def set_cookie(self, key, value, expires = None):
-        self.headers.append(('Set-Cookie', '%s=%s; path=/' % (key, value)))
+        self.add_header('Set-Cookie', '%s=%s; path=/' % (key, value))
 
 
     def get_cookie(self, key = None, default = None):
         return [SimpleCookie(self.get_env('HTTP_COOKIE'))['sid'].value]
+
+
+    def add_header(self, key, value):
+        self.headers.append((key, value))
+
+
+    def get_headers(self):
+        return self.headers
 
 
     def send_headers(self):

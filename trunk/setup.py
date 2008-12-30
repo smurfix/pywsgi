@@ -4,7 +4,7 @@ setup(name             = 'pywsgi',
       description      = 'A high-level class-based API around WSGI/CGI/mod_python',
       long_description = \
 """
-pywsgi provides the following features:
+What pywsgi is:
 
   - An abstraction from low-level gateway interface handlers like WSGI,
     CGI, and mod_python.
@@ -14,6 +14,12 @@ pywsgi provides the following features:
   - GET/POST data handling.
   - Error handling.
   - A pywsgi.util namespace with useful tools.
+
+What pywsgi is not:
+  - An official Python project.
+  - A Python implementation of the WSGI specification. Instead, this module
+    wraps the exising low-level Python implementation (which is named
+    wsgiref).
 """,
       author           = 'Samuel Abels',
       author_email     = 'cheeseshop.python.org@debain.org',
