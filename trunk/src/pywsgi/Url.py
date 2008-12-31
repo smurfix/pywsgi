@@ -20,7 +20,7 @@ class Url(object):
         self.request = request
         self.path    = ''
         self.vars    = []
-        self.rewrite = self.request.has_get_data('rewrite', 1)
+        self.rewrite = self.request.get_data().get_bool('rewrite')
         if self.rewrite:
             self.set_var('rewrite', 1)
 
