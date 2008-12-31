@@ -29,7 +29,7 @@ class WsgiRequest(CgiRequest):
         return self.environment.get(key)
 
 
-    def send_headers(self):
+    def _send_headers(self):
         if self.headers_sent:
             return
         self.headers_sent = True
@@ -40,7 +40,7 @@ class WsgiRequest(CgiRequest):
 
 
     def flush(self):
-        self.send_headers()
+        self._send_headers()
         data = self.data
         self.data = ''
         return [data]

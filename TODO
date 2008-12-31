@@ -1,2 +1,3 @@
-* Use the Table object for uniform access to GET and POST data.
-* Create a Storage object that handles storing the session data.
+* Create a Storage object that handles storing the session data, and replace
+  the get/set_session_directory methods of the Request and RequestHandler
+  classes by methods for passing a session handler.

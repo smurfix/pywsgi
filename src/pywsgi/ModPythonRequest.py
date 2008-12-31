@@ -21,12 +21,12 @@ class ModPythonRequest(Request):
         from mod_python      import apache, Cookie
         from mod_python.util import FieldStorage
         Request.__init__(self, **kwargs)
-        self.cookie_mod = Cookie
-        self.request    = request
-        self.env        = apache.build_cgi_env(request)
-        self.get_data   = cgi.parse_qs(self.get_env('QUERY_STRING'))
-        self.post_data  = self.__unpack_data(request.form)
-        self.thecookies = self.__unpack_data(Cookie.get_cookies(request))
+        self.cookie_mod    = Cookie
+        self.request       = request
+        self.env           = apache.build_cgi_env(request)
+        self.the_get_data  = self.__read_get_data()
+        self.the_post_data = self.__read_post_data()
+        self.the_cookies   = self.__read_cookies()
 
 
     def get_name(self):
@@ -37,37 +37,43 @@ class ModPythonRequest(Request):
         result = {}
         for key, field in data.items():
             result[key] = field.value
-        return Table(result, False, True)
+        return result
+
+
+    def __read_get_data(self):
+        query = cgi.parse_qs(self.get_env('QUERY_STRING'))
+        data  = {}
+        for key, value in query.iteritems():
+            data[key] = value[0]
+        return Table(data, allow_duplicates = False, readonly = True)
+
+
+    def __read_post_data(self):
+        return Table(self.__unpack_data(self.request.form),
+                     allow_duplicates = False,
+                     readonly         = True)
+
+
+    def __read_cookies(self):
+        data = self.__unpack_data(self.cookie_mod.get_cookies(self.request))
+        return Table(data, allow_duplicates = False, readonly = True)
 
 
     def get_env(self, key):
         return self.env[key]
 
 
-    def has_get_data(self, key, value = None):
-        if value is None:
-            return self.get_data.has_key(key)
-        return self.get_data.get(key) == value
+    def get_data(self):
+        return self.the_get_data
 
 
-    def get_get_data(self, key = None, default = None):
-        if key is None:
-            return self.get_data
-        return self.get_data.get(key, default)
-
-
-    def has_post_data(self, key = None, value = None):
+    def has_post_data(self):
         if key is None:
             return self.request.method == 'POST'
-        if value is None:
-            self.post_data.has_key(key)
-        return self.post_data.get(key) == value
 
 
-    def get_post_data(self, key = None, default = None):
-        if key is None:
-            return self.post_data
-        return self.post_data.get(key, default)
+    def post_data(self):
+        return self.the_post_data
 
 
     def set_cookie(self, key, value, expires = None):
@@ -78,15 +84,15 @@ class ModPythonRequest(Request):
 
 
     def cookies(self):
-        return self.thecookies
+        return self.the_cookies
 
 
     def add_header(self, key, value):
-        return self.headers_out.add(key, value)
+        return self.request.headers_out.add(key, value)
 
 
     def get_headers(self):
-        return self.headers_out.items()
+        return self.request.headers_out.items()
 
 
     def flush(self):

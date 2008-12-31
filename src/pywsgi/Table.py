@@ -163,3 +163,55 @@ class Table(object):
             if k == key:
                 return v
         assert False  # Not reached
+
+
+    def get_str(self, key, default = None):
+        """
+        Convenience wrapper around get_first() that casts the value to str
+        before returning it.
+
+        @type  key: string
+        @param key: The name of the attribute.
+        @type  default: string
+        @param default: The value that is returned when no match was found.
+        @rtype:  str
+        @return: The first value, or the default value.
+        """
+        value = self.get_first(key, default)
+        if value is None:
+            return None
+        return str(value)
+
+
+    def get_int(self, key, default = 0):
+        """
+        Convenience wrapper around get_first() that casts the value to int
+        before returning it.
+
+        @type  key: string
+        @param key: The name of the attribute.
+        @type  default: int
+        @param default: The value that is returned when no match was found.
+        @rtype:  int
+        @return: The first value, or the default value.
+        """
+        return int(self.get_first(key, default))
+
+
+    def get_bool(self, key, default = False):
+        """
+        Convenience wrapper around get_first() that casts the value to bool
+        before returning it.
+
+        @type  key: string
+        @param key: The name of the attribute.
+        @type  default: boolean
+        @param default: The value that is returned when no match was found.
+        @rtype:  boolean
+        @return: The first value, or the default value.
+        """
+        return bool(self.get_first(key, default))
+
+
+    def items(self):
+        return self.data_dict

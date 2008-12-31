@@ -17,26 +17,42 @@ from ConfigParser import RawConfigParser
 from Table        import Table
 
 class Session(object):
-    def __init__(self, request, lifetime = 60 * 60):
+    def __init__(self, request, **kwargs):
+        """
+        Should not be called directly. Retrieve the session object by calling
+        request.get_session() instead.
+
+        @type  request: Request
+        @param request: The associated request.
+        @type  kwargs: dict
+        @param kwargs: The following arguments are supported:
+            - lifetime:   The maximum lifetime of the session (in seconds).
+            - on_destroy: A callback, called after destroy() was called.
+        """
         self.request     = request
         self.session_dir = request.get_session_directory()
         self.sid         = None
         self.rcparser    = RawConfigParser()
-        self.lifetime    = lifetime
+        self.lifetime    = kwargs.get('lifetime', 60*60)
+        self.on_destroy  = kwargs.get('on_destroy')
         if self.session_dir is None:
             raise Exception('Please call set_session_directory() first.')
         if not os.path.isdir(self.session_dir):
             raise Exception('No such directory: %s' % self.session_dir)
-        self.start()
+        self._start()
 
 
     def _clear_data(self, init = None):
-        self.thedata = Table(init,
-                             allow_duplicates = False,
-                             callback         = self._on_data_changed)
+        self.the_data = Table(init,
+                              allow_duplicates = False,
+                              callback         = self._on_data_changed)
 
 
     def _on_data_changed(self):
+        """
+        Called by the self.the_data table to inform us that its content
+        changed.
+        """
         self._save_session()
 
 
@@ -48,6 +64,9 @@ class Session(object):
 
 
     def _save_session(self):
+        """
+        Saves the session data to a file.
+        """
         # Create a directory for the session.
         filename = self._get_session_filename()
         dirname  = os.path.dirname(filename)
@@ -59,13 +78,14 @@ class Session(object):
             self.rcparser.add_section('session')
         except:
             pass # Duplicate section.
-        for key, value in self.thedata:
+        for key, value in self.the_data:
             self.rcparser.set('session', key, value)
         self.rcparser.write(open(filename, 'w'))
 
 
     def _load_session(self):
         """
+        Loads the session data from a file.
         Returns True on success, False otherwise.
         """
         filename = self._get_session_filename()
@@ -85,6 +105,9 @@ class Session(object):
 
 
     def _delete_session(self):
+        """
+        Deletes the session data file.
+        """
         filename = self._get_session_filename()
         if not os.path.exists(filename):
             return
@@ -98,11 +121,7 @@ class Session(object):
         self._save_session()
 
 
-    def get_id(self):
-        return self.sid
-
-
-    def start(self):
+    def _start(self):
         """
         May raise an exception on failure.
         """
@@ -116,20 +135,36 @@ class Session(object):
             return self._create_session()
 
 
+    def get_id(self):
+        """
+        Returns the session id.
+
+        @rtype:  string
+        @return: The session id.
+        """
+        return self.sid
+
+
     def destroy(self):
+        """
+        Removes all session data and ends the session.
+        """
         self._delete_session()
         self._clear_data()
         self.sid      = None
         self.rcparser = RawConfigParser()
         self.request.set_cookie('sid', '', 0)
-        self.request._session_destroyed_notify()
+        if self.on_destroy is not None:
+            self.on_destroy()
 
 
     def data(self):
         """
         Returns the data that is associated with the session.
+        The returned table is a read/write object, so it is also used for
+        storing values in the session.
 
         @rtype:  Table
         @return: The session data.
         """
-        return self.thedata
+        return self.the_data
