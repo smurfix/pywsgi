@@ -14,39 +14,82 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class Table(object):
-    def __init__(self, init = None, allow_duplicates = True):
+    def __init__(self,
+                 init             = None,
+                 allow_duplicates = True,
+                 readonly         = False,
+                 callback         = None):
+        """
+        Removes all rows that have the given key from the table.
+
+        @type  init: list|dict
+        @param init: A sequence or dictionary to populate the table.
+        @type  allow_duplicates: boolean
+        @param allow_duplicates: Whether duplicate rows are allowed.
+        @type  callback: function
+        @param callback: Called whenever the content changes.
+        """
         self.allow_duplicates = allow_duplicates
+        self.readonly         = readonly
         self.data_dict        = {}
+        self.callback         = callback
         if init is None:
             self.data_list = []
         elif isinstance(init, list):
             for key, value in init:
                 self.add(key, value)
         elif isinstance(init, dict):
-            self.data_dict = dict([(k, [v]) for k, v in dict.iteritems()])
-            self.data_list = dict.items()
+            self.data_list = init.items()
+            self.data_dict = dict([(k, [v]) for k, v in self.data_list])
         else:
             raise TypeError('Invalid argument type for init argument.')
 
 
+    def __iter__(self):
+        return self.data_list.__iter__()
+
+
+    def __len__(self):
+        return len(self.data_list)
+
+
+    def _emit_changed(self):
+        if self.callback is None:
+            return
+        self.callback()
+
+
     def remove_any(self, key):
+        """
+        Removes all rows that have the given key from the table.
+
+        @type  key: string
+        @param key: The name of the attribute.
+        """
+        if self.readonly:
+            raise Exception('Attempt to modify read-only table.')
         if not self.data_dict.has_key(key):
             return
         old_values = self.data_dict.get(key)
         del self.data_dict[key]
         for value in old_values:
             self.data_list.remove((key, value))
+        self._emit_changed()
 
 
     def add(self, key, value):
         """
-        Adds the given key/value pair. Duplicate keys are allowed.
+        Adds the given key/value pair.
+        If the allow_duplicates argument is True, duplicate keys are allowed.
+        If allow_duplicates is False, this method is equivalent to set().
 
         @type  key: string
         @param key: The name of the attribute.
-        @type  value: string
-        @param value: The name of the attribute.
+        @type  value: object
+        @param value: The value of the attribute.
         """
+        if self.readonly:
+            raise Exception('Attempt to modify read-only table.')
         if not self.allow_duplicates:
             return self.set(key, value)
         self.data_list.append((key, value))
@@ -54,22 +97,69 @@ class Table(object):
             self.data_dict[key].append(value)
         else:
             self.data_dict[key] = [value]
+        self._emit_changed()
 
 
     def set(self, key, value):
+        """
+        Defines the value of the given key. Any existing rows with the same
+        key are removed from the table, regardless of what was passed to the
+        allow_duplicates argument of the table constructor.
+
+        @type  key: string
+        @param key: The name of the attribute.
+        @type  value: string
+        @param value: The value of the attribute.
+        """
+        if self.readonly:
+            raise Exception('Attempt to modify read-only table.')
         self.remove_any(key)
         self.data_dict[key] = [value]
         self.data_list.append((key, value))
+        self._emit_changed()
+
+
+    def has_key(self, key):
+        """
+        Returns True if the given key is in the table, False otherwise.
+
+        @type  key: string
+        @param key: The name of the attribute.
+        @rtype:  boolean
+        @return: True if the key was found, False otherwise.
+        """
+        return self.data_dict.has_key(key)
 
 
     def get(self, key, default = None):
+        """
+        Returns a list of all values that have the given key.
+        If no such row is found, the given default value is returned.
+
+        @type  key: string
+        @param key: The name of the attribute.
+        @type  default: object
+        @param default: The value that is returned when no match was found.
+        @rtype:  list[string]|object
+        @return: The list of values, or the default value.
+        """
         return self.data_dict.get(key, default)
 
 
-    def get_first(self, key, default):
+    def get_first(self, key, default = None):
+        """
+        Returns the value of the first pair that has the given key.
+
+        @type  key: string
+        @param key: The name of the attribute.
+        @type  default: object
+        @param default: The value that is returned when no match was found.
+        @rtype:  string|object
+        @return: The first value, or the default value.
+        """
         if not self.data_dict.has_key(key):
             return default
         for k, v in self.data_list:
             if k == key:
-                return value
+                return v
         assert False  # Not reached

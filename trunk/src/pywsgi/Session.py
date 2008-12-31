@@ -12,15 +12,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-import os, os.path, sha
+import os, os.path, sha, time
 from ConfigParser import RawConfigParser
+from Table        import Table
 
 class Session(object):
     def __init__(self, request, lifetime = 60 * 60):
         self.request     = request
         self.session_dir = request.get_session_directory()
         self.sid         = None
-        self.data        = {}
         self.rcparser    = RawConfigParser()
         self.lifetime    = lifetime
         if self.session_dir is None:
@@ -28,6 +28,16 @@ class Session(object):
         if not os.path.isdir(self.session_dir):
             raise Exception('No such directory: %s' % self.session_dir)
         self.start()
+
+
+    def _clear_data(self, init = None):
+        self.thedata = Table(init,
+                             allow_duplicates = False,
+                             callback         = self._on_data_changed)
+
+
+    def _on_data_changed(self):
+        self._save_session()
 
 
     def _get_session_filename(self):
@@ -45,8 +55,11 @@ class Session(object):
             os.makedirs(dirname)
 
         # Save the session.
-        self.rcparser.add_section('session')
-        for key, value in self.data.iteritems():
+        try:
+            self.rcparser.add_section('session')
+        except:
+            pass # Duplicate section.
+        for key, value in self.thedata:
             self.rcparser.set('session', key, value)
         self.rcparser.write(open(filename, 'w'))
 
@@ -58,14 +71,16 @@ class Session(object):
         filename = self._get_session_filename()
         if not os.path.exists(filename):
             return False
-        if os.path.getmtime(filename) < time() - self.lifetime:
+        if os.path.getmtime(filename) < time.time() - self.lifetime:
             return False
         try:
             self.rcparser.read(filename)
         except:
             return False
+        data = {}
         for option in self.rcparser.options('session'):
-            self.data[option] = self.rcparser.get('session', option)
+            data[option] = self.rcparser.get('session', option)
+        self._clear_data(data)
         return True
 
 
@@ -73,12 +88,13 @@ class Session(object):
         filename = self._get_session_filename()
         if not os.path.exists(filename):
             return
-        os.remove(self.filename)
+        os.remove(filename)
 
 
     def _create_session(self):
         import sha, time
         self.sid = sha.new(str(time.time())).hexdigest()
+        self.request.set_cookie('sid', self.sid, 0)
         self._save_session()
 
 
@@ -92,7 +108,7 @@ class Session(object):
         """
         if self.sid is not None:
             raise Exception('Session already started.')
-        self.sid = self.request.get_cookie('sid')
+        self.sid = self.request.cookies().get_first('sid')
         if self.sid is None:
             return self._create_session()
         if not self._load_session():
@@ -101,8 +117,19 @@ class Session(object):
 
 
     def destroy(self):
-        self.sid      = None
-        self.data     = {}
-        self.rcparser = RawConfigParser()
         self._delete_session()
+        self._clear_data()
+        self.sid      = None
+        self.rcparser = RawConfigParser()
         self.request.set_cookie('sid', '', 0)
+        self.request._session_destroyed_notify()
+
+
+    def data(self):
+        """
+        Returns the data that is associated with the session.
+
+        @rtype:  Table
+        @return: The session data.
+        """
+        return self.thedata

@@ -14,17 +14,19 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 import cgi
 from Request import Request
+from Table   import Table
 
 class ModPythonRequest(Request):
     def __init__(self, request, **kwargs):
         from mod_python      import apache, Cookie
         from mod_python.util import FieldStorage
         Request.__init__(self, **kwargs)
-        self.request   = request
-        self.env       = apache.build_cgi_env(request)
-        self.get_data  = cgi.parse_qs(self.get_env('QUERY_STRING'))
-        self.post_data = self.__unpack_data(request.form)
-        self.cookies   = self.__unpack_data(Cookie.get_cookies(request))
+        self.cookie_mod = Cookie
+        self.request    = request
+        self.env        = apache.build_cgi_env(request)
+        self.get_data   = cgi.parse_qs(self.get_env('QUERY_STRING'))
+        self.post_data  = self.__unpack_data(request.form)
+        self.thecookies = self.__unpack_data(Cookie.get_cookies(request))
 
 
     def get_name(self):
@@ -34,8 +36,8 @@ class ModPythonRequest(Request):
     def __unpack_data(self, data):
         result = {}
         for key, field in data.items():
-            result[key] = [field.value]
-        return result
+            result[key] = field.value
+        return Table(result, False, True)
 
 
     def get_env(self, key):
@@ -69,16 +71,14 @@ class ModPythonRequest(Request):
 
 
     def set_cookie(self, key, value, expires = None):
-        cookie = Cookie.Cookie(key, value)
+        cookie = self.cookie_mod.Cookie(key, value)
         if expires:
             cookie.expires = expires
-        Cookie.add_cookie(self.request, cookie)
+        self.cookie_mod.add_cookie(self.request, cookie)
 
 
-    def get_cookie(self, key = None, default = None):
-        if key is None:
-            return self.cookies
-        return self.cookies.get(key, default)
+    def cookies(self):
+        return self.thecookies
 
 
     def add_header(self, key, value):
