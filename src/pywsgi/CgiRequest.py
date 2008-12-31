@@ -14,11 +14,12 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 import os, cgi
 from Request import Request
+from Table   import Table
 
 class CgiRequest(Request):
     def __init__(self, **kwargs):
         Request.__init__(self, **kwargs)
-        from Cookie import SimpleCookie
+        self.thecookies   = self.__read_cookies()
         self.headers      = []
         self.headers_sent = False
         self.get_data     = cgi.parse_qs(self.get_env('QUERY_STRING'))
@@ -57,6 +58,15 @@ class CgiRequest(Request):
         for key in input:
             output[key] = self.__unpack_post_value(input[key])
         return output
+
+
+    def __read_cookies(self):
+        from Cookie import SimpleCookie
+        cookies_raw = SimpleCookie(self.get_env('HTTP_COOKIE'))
+        cookies     = {}
+        for key, field in cookies_raw.iteritems():
+            cookies[key] = field.value
+        return Table(cookies, False, True)
 
 
     def get_env(self, key):
@@ -102,8 +112,8 @@ class CgiRequest(Request):
         self.add_header('Set-Cookie', '%s=%s; path=/' % (key, value))
 
 
-    def get_cookie(self, key = None, default = None):
-        return [SimpleCookie(self.get_env('HTTP_COOKIE'))['sid'].value]
+    def cookies(self):
+        return self.thecookies
 
 
     def add_header(self, key, value):

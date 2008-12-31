@@ -30,6 +30,10 @@ class Request(object):
             self.session_dir = '/tmp'
 
 
+    def _session_destroyed_notify(self):
+        self.session = None
+
+
     def get_name(self):
         raise Exception('get_name() not implemented...')
 
@@ -151,11 +155,11 @@ class Request(object):
         raise Exception('set_cookie() not implemented...')
 
 
-    def get_cookie(self, key = None, default = None):
+    def cookies(self):
         """
-        Always returns a list with values of the variable with the given name.
+        Returns a table object that contains all cookies.
         """
-        raise Exception('get_cookie() not implemented...')
+        raise Exception('cookies() not implemented...')
 
 
     def handle_exception(self):
