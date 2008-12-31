@@ -17,6 +17,10 @@ from Request import Request
 from Table   import Table
 
 class CgiRequest(Request):
+    """
+    This adapter implements a bridge to plain old mod_cgi.
+    """
+
     def __init__(self, **kwargs):
         Request.__init__(self, **kwargs)
         self.headers      = []

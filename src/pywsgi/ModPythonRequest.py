@@ -17,6 +17,10 @@ from Request import Request
 from Table   import Table
 
 class ModPythonRequest(Request):
+    """
+    This adapter implements a bridge to mod_python.
+    """
+
     def __init__(self, request, **kwargs):
         from mod_python      import apache, Cookie
         from mod_python.util import FieldStorage

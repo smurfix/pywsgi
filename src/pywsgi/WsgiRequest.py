@@ -15,6 +15,10 @@
 from CgiRequest import CgiRequest
 
 class WsgiRequest(CgiRequest):
+    """
+    This adapter implements a bridge to mod_swgi.
+    """
+
     def __init__(self, environment, start_response, **kwargs):
         self.environment    = environment
         self.start_response = start_response
