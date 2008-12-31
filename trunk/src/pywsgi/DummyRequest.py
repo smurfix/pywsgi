@@ -15,4 +15,8 @@
 from Request import Request
 
 class DummyRequest(Request):
+    """
+    This adapter does nothing and may, for example, be useful for unit
+    testing.
+    """
     pass

@@ -14,6 +14,10 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class RequestHandler(object):
+    """
+    A handler that automatically selects a supported request adapter.
+    """
+
     def __init__(self, func, **kwargs):
         self.func        = func
         self.session_dir = kwargs.get('session_dir')

@@ -4,12 +4,15 @@ import os, re, sys
 
 doc_dir  = 'api'
 doc_file = os.path.join(doc_dir, 'pywsgi.py')
-files    = ['../src/pywsgi/Request.py',
+files    = ['../src/pywsgi/Table.py',
+            '../src/pywsgi/Url.py',
+            '../src/pywsgi/Session.py',
+            '../src/pywsgi/Request.py',
             '../src/pywsgi/DummyRequest.py',
-            '../src/pywsgi/ModPythonRequest.py',
             '../src/pywsgi/CgiRequest.py',
             '../src/pywsgi/WsgiRequest.py',
-            '../src/pywsgi/Url.py'] # Order matters - can't resolve inheritance otherwise.
+            '../src/pywsgi/ModPythonRequest.py',
+            '../src/pywsgi/RequestHandler.py'] # Order matters - can't resolve inheritance otherwise.
 classes  = [os.path.splitext(os.path.basename(file))[0] for file in files]
 classes  = ['(?:pywsgi.)?' + cl for cl in classes]
 
@@ -31,6 +34,6 @@ os.system('epydoc ' + ' '.join(['--html',
                                 '--no-private',
                                 '--no-source',
                                 '--no-frames',
-                                '--inheritance=grouped',
+                                '--inheritance=included',
                                 '-v',
                                 '-o %s' % doc_dir, doc_file]))

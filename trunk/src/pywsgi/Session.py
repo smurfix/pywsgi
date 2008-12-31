@@ -17,6 +17,10 @@ from ConfigParser import RawConfigParser
 from Table        import Table
 
 class Session(object):
+    """
+    Represents a session, retrieve via the request handler API.
+    """
+
     def __init__(self, request, **kwargs):
         """
         Should not be called directly. Retrieve the session object by calling

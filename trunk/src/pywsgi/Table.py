@@ -14,13 +14,18 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class Table(object):
+    """
+    Container type used to represent GET, POST, and session data as well
+    as cookies.
+    """
+
     def __init__(self,
                  init             = None,
                  allow_duplicates = True,
                  readonly         = False,
                  callback         = None):
         """
-        Removes all rows that have the given key from the table.
+        Constructor.
 
         @type  init: list|dict
         @param init: A sequence or dictionary to populate the table.

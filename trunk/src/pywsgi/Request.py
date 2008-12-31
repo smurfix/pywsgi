@@ -17,9 +17,13 @@ from Session import Session
 from Table   import Table
 
 class Request(object):
+    """
+    Base class for all request adapters.
+    """
+
     def __init__(self, **kwargs):
         """
-        Base class for all request handlers.
+        Constructor.
 
         @type  kwargs: dict
         @param kwargs: The following arguments are supported:

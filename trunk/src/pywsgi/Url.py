@@ -16,16 +16,32 @@ import os
 from urllib import quote
 
 class Url(object):
+    """
+    Represents a URL, retrieve via the request handler API.
+    """
+
     def __init__(self, request, path = ''):
+        """
+        Constructor.
+
+        @type  request: Request
+        @param request: The associated request.
+        @type  path: str
+        @param path: The initial path, passed to set_path().
+        """
         self.request = request
-        self.path    = ''
         self.vars    = []
         self.rewrite = self.request.get_data().get_bool('rewrite')
+        self.set_path(path)
         if self.rewrite:
             self.set_var('rewrite', 1)
 
 
     def set_path(self, path):
+        """
+        @type  path: str
+        @param path: The initial path, passed to set_path().
+        """
         self.path = str(path)
 
 
@@ -51,6 +67,14 @@ class Url(object):
 
 
     def get_string(self):
+        """
+        Returns the URL as a string. Note that the object is mod_rewrite
+        aware, and depending on whether the rewrite GET variable is set,
+        appends either a path or query variables to the path.
+
+        @rtype:  string
+        @return: The URL.
+        """
         if len(self.vars) == 0:
             return self.path
         vars = []
