@@ -72,8 +72,7 @@ class ModPythonRequest(Request):
 
 
     def has_post_data(self):
-        if key is None:
-            return self.request.method == 'POST'
+        return self.request.method == 'POST'
 
 
     def post_data(self):
