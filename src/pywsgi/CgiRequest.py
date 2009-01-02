@@ -23,11 +23,11 @@ class CgiRequest(Request):
 
     def __init__(self, **kwargs):
         Request.__init__(self, **kwargs)
-        self.headers      = []
-        self.headers_sent = False
-        self.get_data     = self.__read_get_data()
-        self.post_data    = self.__read_post_data()
-        self.the_cookies  = self.__read_cookies()
+        self.headers       = []
+        self.headers_sent  = False
+        self.the_get_data  = self.__read_get_data()
+        self.the_post_data = self.__read_post_data()
+        self.the_cookies   = self.__read_cookies()
 
 
     def get_name(self):

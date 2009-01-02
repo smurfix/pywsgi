@@ -43,6 +43,7 @@ class Session(object):
             raise Exception('Please call set_session_directory() first.')
         if not os.path.isdir(self.session_dir):
             raise Exception('No such directory: %s' % self.session_dir)
+        self._clear_data()
         self._start()
 
 

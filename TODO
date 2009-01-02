@@ -1,3 +1,5 @@
+* Add a map of HTTP status codes.
+* Allow for formating URLs for mod_rewrite.
 * Create a Storage object that handles storing the session data, and replace
   the get/set_session_directory methods of the Request and RequestHandler
   classes by methods for passing a session handler.
