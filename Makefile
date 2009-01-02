@@ -25,7 +25,7 @@ install:
 uninstall:
 	# Sorry, Python's distutils support no such action yet.
 
-test:
+tests:
 	cd tests/$(NAME); \
 		[ -e run_suite.* ] && ./run_suite.* || [ ! -e run_suite.* ]
 
@@ -49,7 +49,7 @@ dist: targz tarbz deb
 ###################################################################
 dist-publish: dist
 	mkdir -p $(DISTDIR)/
-	mv $(PACKAGE)* $(DISTDIR)
+	mv $(PACKAGE)* dist/* $(DISTDIR)
 
 doc-publish:
 	cd doc; make publish
