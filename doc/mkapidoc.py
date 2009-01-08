@@ -7,6 +7,8 @@ doc_file = os.path.join(doc_dir, 'pywsgi.py')
 files    = ['../src/pywsgi/Table.py',
             '../src/pywsgi/Url.py',
             '../src/pywsgi/Session.py',
+            '../src/pywsgi/SessionStore.py',
+            '../src/pywsgi/SessionFileStore.py',
             '../src/pywsgi/Request.py',
             '../src/pywsgi/DummyRequest.py',
             '../src/pywsgi/CgiRequest.py',

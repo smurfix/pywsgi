@@ -18,7 +18,7 @@ from ConfigParser import RawConfigParser
 
 class SessionFileStore(SessionStore):
     """
-    A session store that saves session in a directory on a filesystem.
+    A session store that saves the sessions on a filesystem.
     """
 
     def __init__(self, directory = None):
