@@ -15,8 +15,7 @@
 
 class SessionStore(object):
     """
-    Saves, loads and manages sessions in secondary. This is the base
-    class for all session store implementations.
+    Base class for backends that save, load, and manage sessions in secondary.
     """
 
     def __init__(self):
@@ -45,5 +44,6 @@ class SessionStore(object):
     def _delete(self, session):
         """
         Deletes the session data.
+        Returns True on success, False otherwise.
         """
         raise Exception('Not implemented')

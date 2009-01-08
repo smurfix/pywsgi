@@ -17,7 +17,7 @@ from urllib import quote
 
 class Url(object):
     """
-    Represents a URL, retrieve via the request handler API.
+    Represents an URL, retrieve via the request handler API.
     """
 
     def __init__(self, request, path = ''):
