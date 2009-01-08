@@ -19,8 +19,8 @@ class RequestHandler(object):
     """
 
     def __init__(self, func, **kwargs):
-        self.func        = func
-        self.session_dir = kwargs.get('session_dir')
+        self.func          = func
+        self.session_store = kwargs.get('session_store')
         if self.supports_wsgi():
             import wsgiref.handlers
             wsgiref.handlers.CGIHandler().run(self._handle_wsgi_request)
@@ -60,11 +60,11 @@ class RequestHandler(object):
         from WsgiRequest import WsgiRequest
         request = WsgiRequest(environment,
                               start_response,
-                              session_dir = self.session_dir)
+                              session_store = self.session_store)
         return request.handle(self.func)
 
 
     def _handle_cgi_request(self):
         from CgiRequest import CgiRequest
-        request = CgiRequest(session_dir = self.session_dir)
+        request = CgiRequest(session_store = self.session_store)
         request.handle(self.func)
