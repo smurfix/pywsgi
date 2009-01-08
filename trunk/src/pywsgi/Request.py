@@ -12,9 +12,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-from Url     import Url
-from Session import Session
-from Table   import Table
+from Url              import Url
+from Session          import Session
+from SessionFileStore import SessionFileStore
+from Table            import Table
 
 class Request(object):
     """
@@ -27,15 +28,27 @@ class Request(object):
 
         @type  kwargs: dict
         @param kwargs: The following arguments are supported:
-            - session_dir: The directory in which session data is stored.
+            - session_store: The session storage backend.
         """
-        self.status       = 200;
-        self.content_type = 'text/html; charset=utf-8'
-        self.data         = ''
-        self.session_dir  = kwargs.get('session_dir')
-        self.session      = None
-        if self.session_dir is None:
-            self.session_dir = '/tmp'
+        self.status        = 200;
+        self.content_type  = 'text/html; charset=utf-8'
+        self.data          = ''
+        self.session_store = kwargs.get('session_store')
+        self.session       = None
+        if self.session_store is None:
+            self.session_store = SessionFileStore()
+
+
+    def _save_session(self, session):
+        return self.session_store._save(session)
+
+
+    def _load_session(self, session):
+        return self.session_store._load(session)
+
+
+    def _delete_session(self, session):
+        return self.session_store._delete(session)
 
 
     def _on_session_destroy(self):
@@ -150,24 +163,14 @@ class Request(object):
         return url
 
 
-    def set_session_directory(self, directory):
+    def set_session_store(self, store):
         """
-        Defines the directory in which sessions are stored.
+        Defines the session storage backend.
 
-        @type  directory: str
-        @param directory: The session directory.
+        @type  store: SessionStore
+        @param store: The storage backend.
         """
-        self.session_dir = directory
-
-
-    def get_session_directory(self):
-        """
-        Returns the name of the directory in which the session data is saved.
-
-        @rtype:  string
-        @return: The directory under which sessions are stored.
-        """
-        return self.session_dir
+        self.session_store = store
 
 
     def start_session(self):
