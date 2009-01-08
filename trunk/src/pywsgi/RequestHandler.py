@@ -64,6 +64,12 @@ class RequestHandler(object):
         return request.handle(self.func)
 
 
+    def _handle_mod_python_request(self, req):
+        from ModPythonRequest import ModPythonRequest
+        request = ModPythonRequest(req, session_store = self.session_store)
+        request.handle(self.func)
+
+
     def _handle_cgi_request(self):
         from CgiRequest import CgiRequest
         request = CgiRequest(session_store = self.session_store)
