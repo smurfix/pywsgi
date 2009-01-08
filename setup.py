@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 setup(name             = 'pywsgi',
       version          = '0.9.0',
-      description      = 'A high-level class-based API around WSGI/CGI/mod_python',
+      description      = 'A high-level class-based API around WSGI, CGI, and mod_python',
       long_description = \
 """
 What pywsgi is:
@@ -16,6 +16,7 @@ What pywsgi is:
   - A pywsgi.util namespace with useful tools.
 
 What pywsgi is not:
+
   - An official Python project.
   - A Python implementation of the WSGI specification. Instead, this module
     wraps the exising low-level Python implementation (which is named
